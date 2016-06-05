@@ -37,6 +37,8 @@ public:
     void setDY(int _y);
     SDL_Rect col1();
     SDL_Rect col2();
+    int getX();
+    int getW();
     
 };
 
@@ -89,6 +91,11 @@ SDL_Rect column::col1()
 SDL_Rect column::col2()
 {
     return mColumn2;
+}
+
+int column::getX()
+{
+    return x;
 }
 
 #endif /* column_h */

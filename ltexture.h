@@ -10,11 +10,17 @@
 #define ltexture_h
 
 #include <iostream>
-#include "SDL2/SDL.h"
-#include "SDL2_IMAGE/SDL_image.h"
+#include <SDL2/SDL.h>
+#include <SDL2_IMAGE/SDL_image.h>
+#include <SDL2_TTF/SDL_ttf.h>
+
+//The window we'll be rendering to
+SDL_Window* gWindow = NULL;
 
 //The window renderer
 SDL_Renderer* gRenderer = NULL;
+
+TTF_Font *gFont = NULL;
 
 class LTexture
 {
@@ -28,10 +34,10 @@ public:
     //Loads image at specified path
     bool loadFromFile( std::string path );
     
-#ifdef _SDL_TTF_H
+//#ifdef _SDL_TTF_H
     //Creates image from font string
     bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
-#endif
+//#endif
     
     //Deallocates texture
     void free();
@@ -116,7 +122,7 @@ bool LTexture::loadFromFile( std::string path )
     return mTexture != NULL;
 }
 
-#ifdef _SDL_TTF_H
+//#ifdef _SDL_TTF_H
 bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
 {
     //Get rid of preexisting texture
@@ -151,7 +157,7 @@ bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColo
     //Return success
     return mTexture != NULL;
 }
-#endif
+//#endif
 
 void LTexture::free()
 {

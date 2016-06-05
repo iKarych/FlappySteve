@@ -40,6 +40,7 @@ public:
     void setY(int _y);
     int getV();
     void setM(int _m);
+    void setVY();
     
 };
 
@@ -110,6 +111,11 @@ int steve::getV()
 void steve::setM(int _m)
 {
     mCollider.y=_m;
+}
+
+void steve::setVY()
+{
+    vy=0;
 }
 
 

@@ -9,185 +9,23 @@
 #include "steve.h"
 #include "ltexture.h"
 #include "column.h"
+#include "lostmenu.h"
+#include "showmenu.h"
+#include "initial.h"
+#include "load.h"
+#include "close.h"
+#include "collision.h"
+#include "pausemenu.h"
 
 #include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2_IMAGE/SDL_image.h>
-//#include <stdio.h>
+#include <SDL2_MIXER/SDL_mixer.h>
+#include <SDL2_TTF/SDL_ttf.h>
 #include <string>
 #include <vector>
 #include <cstdlib>
 #include <ctime>
-
-
-//Starts up SDL and creates window
-bool init();
-
-//Loads media
-bool loadMedia();
-
-//Frees media and shuts down SDL
-void close();
-
-//The window we'll be rendering to
-SDL_Window* gWindow = NULL;
-
-
-//Scene textures
-LTexture gBGTexture;
-
-bool init()
-{
-    //Initialization flag
-    bool success = true;
-    
-    //Initialize SDL
-    if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-    {
-        printf( "SDL could not initialize! SDL Error: %s\n", SDL_GetError() );
-        success = false;
-    }
-    else
-    {
-        //Set texture filtering to linear
-        if( !SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1" ) )
-        {
-            printf( "Warning: Linear texture filtering not enabled!" );
-        }
-        
-        //Create window
-        gWindow = SDL_CreateWindow( "SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN );
-        if( gWindow == NULL )
-        {
-            printf( "Window could not be created! SDL Error: %s\n", SDL_GetError() );
-            success = false;
-        }
-        else
-        {
-            //Create vsynced renderer for window
-            gRenderer = SDL_CreateRenderer( gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC );
-            if( gRenderer == NULL )
-            {
-                printf( "Renderer could not be created! SDL Error: %s\n", SDL_GetError() );
-                success = false;
-            }
-            else
-            {
-                //Initialize renderer color
-                SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
-                
-                //Initialize PNG loading
-                int imgFlags = IMG_INIT_PNG;
-                if( !( IMG_Init( imgFlags ) & imgFlags ) )
-                {
-                    printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
-                    success = false;
-                }
-            }
-        }
-    }
-    
-    return success;
-}
-
-bool loadMedia()
-{
-    //Loading success flag
-    bool success = true;
-    
-    //Load dot texture
-    if( !gDotTexture.loadFromFile( "steve.png" ) )
-    {
-        printf( "Failed to load dot texture!\n" );
-        success = false;
-    }
-    
-    //Load background texture
-    if( !gBGTexture.loadFromFile( "bg.png" ) )
-    {
-        printf( "Failed to load background texture!\n" );
-        success = false;
-    }
-    
-    if(!gDColumnTexture.loadFromFile("co2.png"))
-    {
-        printf( "Failed to load down column texture!\n" );
-        success = false;
-    }
-    
-    if(!gUColumnTexture.loadFromFile("cou2.png"))
-    {
-        printf( "Failed to load up column texture!\n" );
-        success = false;
-    }
-    
-    return success;
-}
-
-void close()
-{
-    //Free loaded images
-    gDotTexture.free();
-    gBGTexture.free();
-    gDColumnTexture.free();
-    gUColumnTexture.free();
-    
-    //Destroy window
-    SDL_DestroyRenderer( gRenderer );
-    SDL_DestroyWindow( gWindow );
-    gWindow = NULL;
-    gRenderer = NULL;
-    
-    //Quit SDL subsystems
-    IMG_Quit();
-    SDL_Quit();
-}
-
-bool checkCollision( SDL_Rect a, SDL_Rect b )
-{
-    //The sides of the rectangles
-    int leftA, leftB;
-    int rightA, rightB;
-    int topA, topB;
-    int bottomA, bottomB;
-    
-    //Calculate the sides of rect A
-    leftA = a.x;
-    rightA = a.x + a.w;
-    topA = a.y;
-    bottomA = a.y + a.h;
-    
-    //Calculate the sides of rect B
-    leftB = b.x;
-    rightB = b.x + b.w;
-    topB = b.y;
-    bottomB = b.y + b.h;
-    
-    //If any of the sides from A are outside of B
-    if( bottomA <= topB )
-    {
-        return false;
-    }
-    
-    if( topA >= bottomB )
-    {
-        return false;
-    }
-    
-    if( rightA <= leftB )
-    {
-        return false;
-    }
-    
-    if( leftA >= rightB )
-    {
-        return false;
-    }
-    
-    //If none of the sides from A are outside B
-    return true;
-}
-
 
 int main( int argc, char* args[] )
 {
@@ -211,17 +49,14 @@ int main( int argc, char* args[] )
             //Event handler
             SDL_Event e;
             
-            //The dot that will be moving around on the screen
-            steve dot;
-            
-            std::vector<column> cl;
             
             srand(time(NULL));
             
+
             int n=640;
             
             for(int i=0;i<100;i++)
-            {     
+            {       
                 column c;
                 
                 int u=rand()%150-300;
@@ -237,19 +72,43 @@ int main( int argc, char* args[] )
                 n+=r;
             }
             
+            int i = showmenu(gWindow);
+            if(i==1)
+                quit=true;
+            
             //The background scrolling offset
             int scrollingOffset = 0;
             
             //While application is running
             while( !quit )
             {
+                //If there is no music playing
+                if( Mix_PlayingMusic() == 0 )
+                {
+                    //Play the music
+                    Mix_PlayMusic( gMusic, -1 );
+                }
+                
                 //Handle events on queue
                 while( SDL_PollEvent( &e ) != 0 )
                 {
-                    //User requests quit
-                    if( e.type == SDL_QUIT )
+                    switch(e.type)
                     {
-                        quit = true;
+                        case SDL_QUIT:
+                            quit=true;
+                            break;
+                        case SDL_KEYDOWN:
+                            switch(e.key.keysym.sym)
+                            {
+                                case SDLK_ESCAPE:
+                                    int i=pausemenu(gWindow);
+                                    if(i==1)
+                                    {
+                                        quit=true;
+                                    }
+                                    break;
+                            }
+                            break;
                     }
                     
                     //Handle input for the dot
@@ -265,13 +124,27 @@ int main( int argc, char* args[] )
                     SDL_Rect wall1=it->col1();
                     SDL_Rect wall2=it->col2();
                     
+                    if(it->getX()==270)
+                    {
+                        Mix_PlayChannel( -1, gSiri, 0 );
+                        number++;
+                    }
+                    
                     if(checkCollision(ball, wall1)==true)
                     {
-                        quit=true;
+                        Mix_PlayChannel( -1, gOutch, 0 );
+                        int i=closemenu(gWindow);
+                        if(i==1)
+                        {
+                            quit=true;
+                        }
                     }
                     else if(checkCollision(ball, wall2)==true)
                     {
-                        quit=true;
+                        Mix_PlayChannel( -1, gOutch, 0 );
+                        int i=closemenu(gWindow);
+                        if(i==1)
+                            quit=true;
                     }
                     
                 }
@@ -297,6 +170,11 @@ int main( int argc, char* args[] )
                 {
                     it->render();
                 }
+                
+                std::string s = std::to_string(number);
+                
+                count.loadFromRenderedText(s, SDL_Color {0,0,0});
+                count.render(0, 0);
                 
                 //Update screen
                 SDL_RenderPresent( gRenderer );
