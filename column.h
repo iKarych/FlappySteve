@@ -15,12 +15,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2_IMAGE/SDL_image.h>
 
-LTexture gDColumnTexture;
-LTexture gUColumnTexture;
-
 class column
 {
-    int x,y1,y2;
+    int x,y1,y2,s;
     SDL_Rect mColumn1;
     SDL_Rect mColumn2;
 public:
@@ -29,12 +26,13 @@ public:
     int DN_CWidth=gDColumnTexture.getWidth();
     int DN_CHeight=gDColumnTexture.getHeight();
     static const int left=2;
-    column(int _x=0,int _y1=0,int _y2=249);
+    column(int _x=0,int _y1=0,int _y2=249,int _s=0);
     void render();
     void move();
     void setX(int _x);
     void setUY(int _y);
     void setDY(int _y);
+    void setS(int _s);
     SDL_Rect col1();
     SDL_Rect col2();
     int getX();
@@ -42,23 +40,23 @@ public:
     
 };
 
-column::column(int _x,int _y1,int _y2)
+column::column(int _x,int _y1,int _y2,int _s)
 {
-    x=_x;y1=_y1;y2=_y2;
+    x=_x;y1=_y1;y2=_y2;s=_s;
     
-    mColumn1.w=UP_CWidth; mColumn1.h=UP_CHeight;
-    mColumn2.w=DN_CWidth; mColumn2.h=DN_CHeight;
+    mColumn1.w=UP_CWidth-5; mColumn1.h=UP_CHeight-5;
+    mColumn2.w=DN_CWidth-5; mColumn2.h=DN_CHeight-5;
 }
 
 void column::move()
 {
-    x-=left;
+    x-=left+s;
     
-    mColumn1.x=x;
-    mColumn1.y=y1;
+    mColumn1.x=x+5;
+    mColumn1.y=y1+5;
     
-    mColumn2.x=x;
-    mColumn2.y=y2;
+    mColumn2.x=x+5;
+    mColumn2.y=y2+5;
     
 }
 
@@ -96,6 +94,11 @@ SDL_Rect column::col2()
 int column::getX()
 {
     return x;
+}
+
+void column::setS(int _s)
+{
+    s=_s;
 }
 
 #endif /* column_h */

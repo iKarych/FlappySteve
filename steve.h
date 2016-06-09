@@ -15,12 +15,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2_IMAGE/SDL_image.h>
 
-LTexture gDotTexture;
-
-
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
 class steve
 {
     int x,y;
@@ -31,8 +25,9 @@ public:
     int DOT_WIDTH = gDotTexture.getWidth();
     int DOT_HEIGHT = gDotTexture.getHeight();
     static const int DOT_VEL = 10;
-    constexpr static const double ACC = 2;
-    steve(int _x=300,int _y=200,int _vy=0);
+    //constexpr static const
+    double ACC = 2;
+    steve(int _x=300,int _y=240,int _vy=0);
     void handleEvent(SDL_Event& e);
     void move();
     void render();
@@ -41,6 +36,7 @@ public:
     int getV();
     void setM(int _m);
     void setVY();
+    int getX();
     
 };
 
@@ -48,7 +44,6 @@ steve::steve(int _x,int _y,int _vy)
 {
     x=_x;y=_y;
     vy=_vy;
-    mCollider.w=DOT_WIDTH; mCollider.h=DOT_HEIGHT;
 }
 
 void steve::handleEvent(SDL_Event& e)
@@ -74,17 +69,20 @@ void steve::handleEvent(SDL_Event& e)
 
 void steve::move()
 {    
-    y += vy+ACC;
+    y +=vy+ACC;
     
-    mCollider.x=x;
-    mCollider.y=y;
+    mCollider.w=gDotTexture.getWidth()-5;
+    mCollider.h=gDotTexture.getHeight()-5;
+    mCollider.x=x+5;
+    mCollider.y=y+5;
     
-//    if( ( y < 0 ) || ( y + DOT_HEIGHT > SCREEN_HEIGHT ) || checkCollision( mCollider, wall ) )
-//    {
-//        //Move back
-//        y -= vy;
-//        mCollider.y = y;
-//    }
+    if( ( y < 0 ) || ( y + gDotTexture.getHeight() > SCREEN_HEIGHT ) )
+    {
+        //Move back
+        y -=vy+ACC;
+        mCollider.y = y;
+    }
+
 }
 
 void steve::render()
@@ -116,6 +114,11 @@ void steve::setM(int _m)
 void steve::setVY()
 {
     vy=0;
+}
+
+int steve::getX()
+{
+    return x;
 }
 
 

@@ -11,6 +11,8 @@
 
 #include "ltexture.h"
 
+#include <SDL2_MIXER/SDL_mixer.h>
+
 bool init()
 {
     //Initialization flag
@@ -77,6 +79,7 @@ bool init()
     
     return success;
 }
+
 
 
 #endif /* initial_h */

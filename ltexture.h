@@ -14,13 +14,14 @@
 #include <SDL2_IMAGE/SDL_image.h>
 #include <SDL2_TTF/SDL_ttf.h>
 
-//The window we'll be rendering to
-SDL_Window* gWindow = NULL;
-
-//The window renderer
-SDL_Renderer* gRenderer = NULL;
-
-TTF_Font *gFont = NULL;
+extern const int SCREEN_WIDTH;
+extern const int SCREEN_HEIGHT;
+extern SDL_Window* gWindow;
+extern SDL_Renderer* gRenderer;
+extern TTF_Font *gFont;
+extern TTF_Font *gScore;
+extern TTF_Font *gNm;
+extern TTF_Font *gSub;
 
 class LTexture
 {
@@ -36,7 +37,7 @@ public:
     
 //#ifdef _SDL_TTF_H
     //Creates image from font string
-    bool loadFromRenderedText( std::string textureText, SDL_Color textColor );
+    bool loadFromRenderedText( std::string textureText, SDL_Color textColor, TTF_Font *newFont);
 //#endif
     
     //Deallocates texture
@@ -123,13 +124,13 @@ bool LTexture::loadFromFile( std::string path )
 }
 
 //#ifdef _SDL_TTF_H
-bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor )
+bool LTexture::loadFromRenderedText( std::string textureText, SDL_Color textColor, TTF_Font *newFont)
 {
     //Get rid of preexisting texture
     free();
     
     //Render text surface
-    SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+    SDL_Surface* textSurface = TTF_RenderText_Solid( newFont, textureText.c_str(), textColor );
     if( textSurface != NULL )
     {
         //Create texture from surface pixels

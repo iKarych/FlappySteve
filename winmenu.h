@@ -1,17 +1,19 @@
 //
-//  showmenu.h
+//  winmenu.h
 //  Flappy_Steve
 //
-//  Created by Krzysztof on 6/5/16.
+//  Created by Krzysztof on 6/8/16.
 //  Copyright © 2016 Krzysztof. All rights reserved.
 //
 
-#ifndef showmenu_h
-#define showmenu_h
+#ifndef winmenu_h
+#define winmenu_h
 
 #include "startover.h"
 
-int showmenu(SDL_Window* screen)
+#include <SDL2_MIXER/SDL_mixer.h>
+
+int winmenu(SDL_Window* screen)
 {
     Uint32 time;
     int x,y;
@@ -32,12 +34,6 @@ int showmenu(SDL_Window* screen)
     pos[0].y=SCREEN_HEIGHT/2;
     pos[1].y=SCREEN_HEIGHT/2+menus[0].getHeight();
     so.x=600; so.y=440;
-    
-    Mix_PlayMusic( gMusic, -1 );
-    
-    
-    
-    //SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0x00, 0x00, 0x00));
     
     SDL_Event event;
     
@@ -91,13 +87,12 @@ int showmenu(SDL_Window* screen)
                             {
                                 menus[j].free();
                             }
-                            
                             if(i==0)
                             {
                                 startover();
                                 return 0;
                             }
-                            else
+                            else if(i==1)
                                 return 1;
                         }
                     }
@@ -154,24 +149,25 @@ int showmenu(SDL_Window* screen)
         }
         SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear( gRenderer );
-        gBMTexture.render(0, 0);
+        gCongrats.render(0, 0);
         if(Mix_PausedMusic())
             gMSound.render(so.x, so.y);
         else if(Mix_PausedMusic()==0)
             gSound.render(so.x,so.y);
+        
         for(int i=0;i<NUMMENU;i++)
         {
             menus[i].render( pos[i].x, pos[i].y );
-            
-            
         }
+        std::string s = std::to_string(number);
+        
+        count.loadFromRenderedText(s, textColor,gFont);
         gDataTextures[0].loadFromRenderedText( "Highscore:"+std::to_string( (long)gData[0] ), textColor ,gFont);
-        gName.loadFromRenderedText("Flappy Steve", SDL_Color{0,0,102}, gNm);
-        gSubtitle.loadFromRenderedText("Will you surive...?",SDL_Color{0,0,0},gSub);
+        count.render(0, 0);
         gDataTextures[0].render(0, 410);
-        gSubtitle.render((SCREEN_WIDTH-gSubtitle.getWidth())/2, 100);
-        gName.render((SCREEN_WIDTH-gName.getWidth())/2,60);
+        
         SDL_RenderPresent(gRenderer);
+        
         if(1000/30>(SDL_GetTicks()-time))
         {
             SDL_Delay(1000/30>(SDL_GetTicks()-time));
@@ -181,4 +177,5 @@ int showmenu(SDL_Window* screen)
     
 }
 
-#endif /* showmenu_h */
+
+#endif /* winmenu_h */

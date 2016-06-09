@@ -9,7 +9,7 @@
 #ifndef pausemenu_h
 #define pausemenu_h
 
-#include "lostmenu.h"
+#include "startover.h"
 
 int pausemenu(SDL_Window* screen)
 {
@@ -21,10 +21,11 @@ int pausemenu(SDL_Window* screen)
     bool selected[NUMMENU]={0,0,0};
     SDL_Color color[2]={{0,0,0},{255,0,0}};
     
-    menus[0].loadFromRenderedText(labels[0],color[0]);
-    menus[1].loadFromRenderedText(labels[1], color[0]);
-    menus[2].loadFromRenderedText(labels[2], color[0]);
+    menus[0].loadFromRenderedText(labels[0],color[0],gScore);
+    menus[1].loadFromRenderedText(labels[1], color[0],gScore);
+    menus[2].loadFromRenderedText(labels[2], color[0],gScore);
     SDL_Rect pos[NUMMENU];
+    SDL_Rect so;
     for(int i=0;i<NUMMENU;i++)
     {
         pos[i].x=SCREEN_WIDTH/2-menus[i].getWidth()/2;
@@ -32,6 +33,7 @@ int pausemenu(SDL_Window* screen)
     pos[0].y=SCREEN_HEIGHT/2-menus[0].getHeight();
     pos[1].y=SCREEN_HEIGHT/2;
     pos[2].y=SCREEN_HEIGHT/2+menus[0].getHeight();
+    so.x=600; so.y=440;
     
     //SDL_FillRect(screen, &screen->clip_rect, SDL_MapRGB(screen->format, 0x00, 0x00, 0x00));
     
@@ -63,7 +65,7 @@ int pausemenu(SDL_Window* screen)
                             {
                                 selected[i]=true;
                                 menus[i].free();
-                                menus[i].loadFromRenderedText(labels[i], color[1]);
+                                menus[i].loadFromRenderedText(labels[i], color[1],gScore);
                             }
                         }
                         else
@@ -72,7 +74,7 @@ int pausemenu(SDL_Window* screen)
                             {
                                 selected[i]=false;
                                 menus[i].free();
-                                menus[i].loadFromRenderedText(labels[i], color[0]);
+                                menus[i].loadFromRenderedText(labels[i], color[0],gScore);
                             }
                         }
                     }break;
@@ -89,37 +91,28 @@ int pausemenu(SDL_Window* screen)
                             }
                             if(i==0)
                             {
-                                dot.setY(200);
-                                dot.setVY();
-                                cl.clear();
-                                number=0;
-                                
-                                int n=640;
-                                
-                                for(int i=0;i<100;i++)
-                                {
-                                    column c;
-                                    
-                                    int u=rand()%150-300;
-                                    int d=u+370+120;
-                                    int r=200;
-                                    
-                                    c.setX(n);
-                                    c.setUY(u);
-                                    c.setDY(d);
-                                    
-                                    cl.push_back(c);
-                                    
-                                    n+=r;
-                                }
-                                
-                                
+                                startover();
                                 return 0;
                             }
                             else if(i==1)
                                 return 0;
                             else
                                 return 1;
+                        }
+                    }
+                    if(x>=so.x && x<=so.x+gSound.getWidth() && y>=so.y && y<=so.y+gSound.getHeight())
+                    {
+                        if( Mix_PausedMusic() == 1 )
+                        {
+                            //Resume the music
+                            Mix_ResumeMusic();
+                            
+                        }
+                        //If the music is playing
+                        else if(Mix_PausedMusic()==0)
+                        {
+                            //Pause the music
+                            Mix_PauseMusic();
                         }
                     }break;
                 case SDL_KEYDOWN:
@@ -145,31 +138,7 @@ int pausemenu(SDL_Window* screen)
                         {
                             menus[i].free();
                         }
-                        dot.setY(200);
-                        dot.setVY();
-                        cl.clear();
-                        number=0;
-                        
-                        int n=640;
-                        
-                        for(int i=0;i<100;i++)
-                        {
-                            column c;
-                            
-                            int u=rand()%150-300;
-                            int d=u+370+120;
-                            int r=200;
-                            
-                            c.setX(n);
-                            c.setUY(u);
-                            c.setDY(d);
-                            
-                            cl.push_back(c);
-                            
-                            n+=r;
-                        }
-                        
-                        
+                        startover();
                         return 0;
                     }
                     else if(event.key.keysym.sym==SDLK_p)
@@ -192,6 +161,11 @@ int pausemenu(SDL_Window* screen)
         }
         SDL_SetRenderDrawColor( gRenderer, 0xFF, 0xFF, 0xFF, 0xFF );
         SDL_RenderClear( gRenderer );
+        gMan.render((SCREEN_WIDTH-gMan.getWidth())/2,(SCREEN_HEIGHT-gMan.getHeight())/2);
+        if(Mix_PausedMusic())
+            gMSound.render(so.x, so.y);
+        else if(Mix_PausedMusic()==0)
+            gSound.render(so.x,so.y);
         for(int i=0;i<NUMMENU;i++)
         {
             menus[i].render( pos[i].x, pos[i].y );
@@ -200,8 +174,14 @@ int pausemenu(SDL_Window* screen)
         }
         std::string s = std::to_string(number);
         
-        count.loadFromRenderedText(s, SDL_Color {0,0,0});
+        count.loadFromRenderedText(s, SDL_Color {0,0,0},gFont);
         count.render(0, 0);
+        gDataTextures[0].loadFromRenderedText( "Highscore:"+std::to_string( (long)gData[0] ), textColor ,gFont);
+        gToilet.loadFromRenderedText("Toilet Time", SDL_Color {0,153,76}, gNm);
+        gDataTextures[0].render(0, 410);
+        gToilet.render((SCREEN_WIDTH-gToilet.getWidth())/2, 60);
+        
+        
         SDL_RenderPresent(gRenderer);
         if(1000/30>(SDL_GetTicks()-time))
         {
