@@ -18,7 +18,6 @@
 
 #include <vector>
 
-
 extern steve dot;
 extern droid robot;
 extern bonus mark1, mark2;

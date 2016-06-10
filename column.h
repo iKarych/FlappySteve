@@ -15,6 +15,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2_IMAGE/SDL_image.h>
 
+//Upper and lower column
 class column
 {
     int x,y1,y2,s;

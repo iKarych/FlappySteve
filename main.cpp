@@ -41,8 +41,8 @@ int anumber=0;
 int cho;
 
 //Vectors
-std::vector<column> cl;
-std::vector<google> googles;
+std::vector<column> cl;         //Vector of columns
+std::vector<google> googles;    //Vector of Google letters
 
 //Window
 SDL_Window* gWindow = NULL;
@@ -94,10 +94,10 @@ SDL_Rect gSpriteClips[ WALKING_ANIMATION_FRAMES ];
 SDL_Color textColor = { 0, 0, 0, 0xFF };
 
 //Classes
-steve dot;
-droid robot;
-bonus mark1, mark2;
-choose wisely;
+steve dot;              //Hero
+droid robot;            //Villain
+bonus mark1, mark2;     //Question marks
+choose wisely;          //Text
 
 int main( int argc, char* args[] )
 {
@@ -171,11 +171,10 @@ int main( int argc, char* args[] )
                             
                     }
                     
-                    //Handle input for the dot
+                    //Handle input for steve
                     dot.handleEvent( e );
                 }
                 
-                //Move the dot
                 dot.move();
                 mark1.move();
                 mark2.move();
@@ -183,13 +182,12 @@ int main( int argc, char* args[] )
                 SDL_Rect ball=dot.st();
                 SDL_Rect bmark1=mark1.col1();
                 SDL_Rect bmark2=mark2.col1();
-                //std::cout<<ball.w<<std::endl;
+
                 for(auto it=cl.begin();it!=cl.end();++it)
                 {
                     it->move();
                     SDL_Rect wall1=it->col1();
                     SDL_Rect wall2=it->col2();
-                    //std::cout<<wall1.w<<std::endl;
                     
                     if(it->getX()==270)
                     {

@@ -15,6 +15,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2_IMAGE/SDL_image.h>
 
+//Hero class
 class steve
 {
     int x,y;
@@ -25,8 +26,7 @@ public:
     int DOT_WIDTH = gDotTexture.getWidth();
     int DOT_HEIGHT = gDotTexture.getHeight();
     static const int DOT_VEL = 10;
-    //constexpr static const
-    double ACC = 2;
+    constexpr static const double ACC = 2;
     steve(int _x=300,int _y=240,int _vy=0);
     void handleEvent(SDL_Event& e);
     void move();

@@ -39,14 +39,14 @@ public:
 bonus::bonus(int _x,int _y,int _s)
 {
     x=_x;y=_y;s=_s;
-    
-    cBonus.w=CWidth; cBonus.h=CHeight;
 }
 
 void bonus::move()
 {
     x-=left+s;
     
+    cBonus.w=gBonus.getWidth();
+    cBonus.h=gBonus.getHeight();
     cBonus.x=x;
     cBonus.y=y;
     
